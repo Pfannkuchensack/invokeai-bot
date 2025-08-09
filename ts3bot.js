@@ -1,6 +1,8 @@
-import { TeamSpeak, TeamSpeakClient } from "ts3-nodejs-library";
+import { TeamSpeak } from "ts3-nodejs-library";
 import { t2i } from "./t2i.js";
 import { upscalex2 } from "./upscalex2.js";
+import dotenv from "dotenv";
+dotenv.config();
 
 const teamspeak = new TeamSpeak({
   host: process.env.ts3host,
@@ -25,14 +27,18 @@ teamspeak.on("ready", () => {
     );
     ev.client.message("Ich kann dir folgende Befehle ausführen:");
     ev.client.message("!image <prompt>");
-	ev.client.message("Command: !image gibt dir ein 512x512 Bild zurück mit dem gegebenen Prompt.");
-	ev.client.message("!workflow <prompt>");
-	ev.client.message("Command: !workflow gibt dir ein 1280x720 Bild zurück mit dem gegebenen Prompt.");
+    ev.client.message(
+      "Command: !image gibt dir ein 512x512 Bild zurück mit dem gegebenen Prompt."
+    );
+    ev.client.message("!workflow <prompt>");
+    ev.client.message(
+      "Command: !workflow gibt dir ein 1280x720 Bild zurück mit dem gegebenen Prompt."
+    );
     //ev.client.message("!help");
   });
   teamspeak.on("textmessage", (ev) => {
-	// !image <prompt> // t2i
-	if(ev.invoker.nickname == process.env.ts3nickname) return;
+    // !image <prompt> // t2i
+    if (ev.invoker.nickname == process.env.ts3nickname) return;
     if (ev.msg.startsWith("!image")) {
       let prompt = {
         positive: ev.msg.slice(7),
@@ -50,27 +56,35 @@ teamspeak.on("ready", () => {
         clip: 0,
         scheduler: "euler",
       };
-	  t2i(config, prompt).then((imageurl) => {
-		ev.invoker.message("Hier ist dein Image: " + imageurl);
-		console.log(imageurl + " " + ev.invoker.nickname + " " + prompt.positive);
-	  });
+      t2i(config, prompt).then((imageurl) => {
+        ev.invoker.message("Hier ist dein Image: " + imageurl);
+        console.log(
+          imageurl + " " + ev.invoker.nickname + " " + prompt.positive
+        );
+      });
     }
-	// !workflow <prompt> // upscalex2
-	if (ev.msg.startsWith("!workflow")) {
-	  let prompt = {
-		positive: ev.msg.slice(10),
-	  };
-	  let config = {
-	  };
-	  upscalex2(config, prompt).then((imageurl) => {
-		ev.invoker.message("Hier ist dein Image: " + imageurl);
-		console.log(imageurl + " " + ev.invoker.nickname + " " + prompt.positive);
-	  });
-	}
+    // !workflow <prompt> // upscalex2
+    if (ev.msg.startsWith("!workflow")) {
+      let prompt = {
+        positive: ev.msg.slice(10),
+      };
+      let config = {};
+      upscalex2(config, prompt).then((imageurl) => {
+        ev.invoker.message("Hier ist dein Image: " + imageurl);
+        console.log(
+          imageurl + " " + ev.invoker.nickname + " " + prompt.positive
+        );
+      });
+    }
   });
 });
 
 teamspeak.on("error", (error) => {
   //teamspeak had an error
   console.log(error);
+});
+
+teamspeak.on("close", () => {
+  //teamspeak connection closed
+  console.log("Connection closed");
 });

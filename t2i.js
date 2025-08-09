@@ -40,7 +40,8 @@ return new Promise((resolve, reject) => {
       socket.emit("subscribe_queue", { queue_id: "bot_queue" });
 
       socket.on("queue_item_status_changed", (result) => {
-        if (result.queue_item.status == "completed") {
+        //console.log("Queue item status changed:", result);
+        if (result.status == "completed") {
 			// remove socket listener
 			socket.off("queue_item_status_changed");
           //console.log("Request complete:", result);

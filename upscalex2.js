@@ -28,7 +28,8 @@ return new Promise((resolve, reject) => {
       socket.emit("subscribe_queue", { queue_id: "bot_queue" });
 
       socket.on("queue_item_status_changed", (result) => {
-        if (result.queue_item.status == "completed") {
+		console.log(result);
+        if (result.status == "completed") {
           //console.log("Request complete:", result);
           fetch(
             "http://127.0.0.1:9090/api/v1/boards/7372d224-10af-4998-8cb4-d0990f0cec25/image_names"
